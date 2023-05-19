@@ -3,8 +3,6 @@ package tictactoe.shared;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
-import tictactoe.server.TileState;
-
 public class Board {
   private static final int TILE_NUMBER = 3;
 

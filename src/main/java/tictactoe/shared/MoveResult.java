@@ -1,5 +1,5 @@
 package tictactoe.shared;
 
-public enum MoveResult implements MoveResultInterface {
+public enum MoveResult {
   INVALID_MOVE, TILE_NOT_EMPTY, MOVE_ALLOWED, TIE, VICTORY;
 }

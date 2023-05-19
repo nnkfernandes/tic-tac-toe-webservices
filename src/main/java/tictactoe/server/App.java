@@ -14,10 +14,8 @@ import com.corundumstudio.socketio.listener.DataListener;
  */
 public class App {
 
-    private static Optional<Player> player1;
-    private static Optional<Player> player2;
-    
-
+    private static Optional<Player> player1 = Optional.empty();
+    private static Optional<Player> player2 = Optional.empty();
 
     public static void main(String[] args) throws InterruptedException {
         Configuration config = new Configuration();
@@ -30,16 +28,14 @@ public class App {
             public void onData(SocketIOClient client, String name, AckRequest ackRequest) {
 
                 if (player1.isEmpty()) {
-                    
-                    player1.get().setSocket(client);
+                    player1 = Optional.of(new Player(client, name));
+                    client.sendEvent("entergame", name);
                 } else if (player2.isEmpty()) {
-                    player2.get().setSocket(client);
+                    player2 = Optional.of(new Player(client, name));
+                    player1.get().getSocket().sendEvent("opponentEntered", name);
                 } else {
-                    System.out.println("The room is full.");
+                    client.sendEvent("roomFull");
                 }
-
-                // broadcast messages to all clients
-                server.getBroadcastOperations().sendEvent("entergame", name);
             }
         });
 
