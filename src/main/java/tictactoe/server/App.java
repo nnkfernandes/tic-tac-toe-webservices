@@ -41,7 +41,7 @@ public class App {
                         JSONObject players = new JSONObject();
                         players.put("player1", player1.get().getName());
                         players.put("player2", name);
-                        server.getBroadcastOperations().sendEvent("players", players.toString());
+                        server.getBroadcastOperations().sendEvent("setPlayers", players.toString());
                         server.getBroadcastOperations().sendEvent("updateBoard", new Board().toString());
                     } catch (Exception e) {
                     }

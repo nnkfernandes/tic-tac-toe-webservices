@@ -32,11 +32,19 @@ public class App {
         // Perform actions upon disconnection
       });
 
-      socket.on("players", args -> {
+      socket.on("setPlayers", args -> {
         try {
           JSONObject names = new JSONObject((String) args[0]);
           p1Name = names.getString("player1");
           p2Name = names.getString("player2");
+        } catch (JSONException e) {
+        }
+      });
+      socket.on("updateScore", args -> {
+        try {
+          JSONObject scores = new JSONObject((String) args[0]);
+          p1Score = scores.getInt("player1");
+          p2Score = scores.getInt("player2");
         } catch (JSONException e) {
         }
       });
@@ -49,7 +57,6 @@ public class App {
         System.out.println("-".repeat(scoreStr.length()));
         System.out.println("\n");
         System.out.println(board);
-        // Print the board to screen
       });
       socket.on("makeMove", args -> {
         System.out.println(args[0]);
