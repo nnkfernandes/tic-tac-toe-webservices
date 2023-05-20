@@ -16,6 +16,7 @@ import tictactoe.shared.Board;
  */
 public class App {
 
+    private static SocketIOServer server;
     private static Optional<Player> player1 = Optional.empty();
     private static Optional<Player> player2 = Optional.empty();
 
@@ -24,7 +25,7 @@ public class App {
         config.setHostname("localhost");
         config.setPort(9092);
 
-        final SocketIOServer server = new SocketIOServer(config);
+        server = new SocketIOServer(config);
         server.addEventListener("entergame", String.class, (client, name, ack) -> {
             if (player1.isEmpty()) {
                 player1 = Optional.of(new Player(client, name));
@@ -37,21 +38,42 @@ public class App {
                     player1.get().getSocket().sendEvent("opponentEntered", name);
                     ack.sendAckData("player2");
 
-                    try {
-                        JSONObject players = new JSONObject();
-                        players.put("player1", player1.get().getName());
-                        players.put("player2", name);
-                        server.getBroadcastOperations().sendEvent("setPlayers", players.toString());
-                        server.getBroadcastOperations().sendEvent("updateBoard", new Board().toString());
-                    } catch (Exception e) {
-                    }
+                    startGame();
                 }
             } else {
                 ack.sendAckData("roomFull");
             }
+
         });
 
         server.start();
 
     }
+
+    public static void startGame() {
+        try {
+            JSONObject players = new JSONObject();
+            players.put("player1", player1.get().getName());
+            players.put("player2", player2.get().getName());
+            server.getBroadcastOperations().sendEvent("setPlayers", players.toString());
+        } catch (Exception e) {
+        }
+        server.getBroadcastOperations().sendEvent("updateBoard", new Board().toString());
+        player1.get().getSocket().sendEvent("makeMove", new AckCallback<String>(String.class) {
+            @Override
+            public void onSuccess(String result) {
+                // Handle acknowledgment from the client
+            }
+
+            @Override
+            public void onTimeout() {
+                // Handle acknowledgment timeout (optional)
+            }
+        });
+    }
+
+    public Board handleMove() {
+
+    }
+
 }

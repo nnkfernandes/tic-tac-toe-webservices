@@ -22,6 +22,7 @@ public class App {
   public static void main(String[] clArgs) {
     try {
       socket = IO.socket("http://localhost:9092");
+
       socket.on(Socket.EVENT_CONNECT, (args) -> {
         // System.out.println("Connected to server");
         // Perform actions upon successful connection
@@ -58,6 +59,7 @@ public class App {
         System.out.println("\n");
         System.out.println(board);
       });
+
       socket.on("makeMove", args -> {
         System.out.println(args[0]);
         if (args.length > 1 && args[1] instanceof Ack) {
