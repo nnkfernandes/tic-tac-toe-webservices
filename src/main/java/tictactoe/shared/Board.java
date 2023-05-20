@@ -1,9 +1,10 @@
 package tictactoe.shared;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
-public class Board {
+public class Board implements Serializable {
   private static final int TILE_NUMBER = 3;
 
   protected TileState[][] board = new TileState[TILE_NUMBER][TILE_NUMBER];
