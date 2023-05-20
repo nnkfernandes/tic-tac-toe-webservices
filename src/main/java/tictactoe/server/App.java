@@ -29,18 +29,18 @@ public class App {
             @Override
             public void onData(SocketIOClient client, String name, AckRequest ackRequest) {
 
-                JSONObject response = new JSONObject();
+                String response = "";
                 try {
                     if (player1.isEmpty()) {
                         player1 = Optional.of(new Player(client, name));
-                        response.put("result", "player1");
+                        response = "player1";
                     } else if (player2.isEmpty()) {
                         if (name == player1.get().getName()) {
-                            response.put("result", "nameAlreadryUsed");
+                            response="nameAlreadryUsed";
                         } else {
                             player2 = Optional.of(new Player(client, name));
                             player1.get().getSocket().sendEvent("opponentEntered", name);
-                            response.put("result", "player2");
+                            response= "player2";
 
                             JSONObject players = new JSONObject();
                             players.put("player1", player1.get().getName());
@@ -48,17 +48,17 @@ public class App {
                             server.getBroadcastOperations().sendEvent("players", players);
                         }
                     } else {
-                        response.put("result", "roomFull");
+                        response="roomFull";
                     }
                 } catch (Exception e) {
                 }
-                ackRequest.sendAckData(new Object[] { (Object) response });
+                ackRequest.sendAckData(response);
             }
         });
 
         server.start();
 
-        
+
 
         Thread.sleep(Integer.MAX_VALUE);
 

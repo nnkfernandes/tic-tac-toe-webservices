@@ -50,22 +50,18 @@ public class App {
     String name = scanner.nextLine();
 
     socket.emit("entergame", name, (Ack) args -> {
-      JSONObject response = (JSONObject) args[0];
-      System.out.println(response);
-      try {
-        String result = response.getString("result");
-        if (result.equals("player1")) {
+      String response = (String) args[0];
+
+        if (response.equals("player1")) {
           System.out.println("You are player 1, waiting for other player...");
-        } else if (result.equals("player2")) {
+        } else if (response.equals("player2")) {
           System.out.println("You are player 2, the game is about to start.");
-        } else if (result.equals("nameAlreadyUsed")) {
+        } else if (response.equals("nameAlreadyUsed")) {
           System.out.println("This name is already used");
           enterGame();
-        } else if (result.equals("roomFull")) {
+        } else if (response.equals("roomFull")) {
           System.out.println("The room is full");
         }
-      } catch (JSONException e) {
-      }
     });
 
     scanner.close();
