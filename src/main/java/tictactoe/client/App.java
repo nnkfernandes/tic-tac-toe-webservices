@@ -14,6 +14,10 @@ import tictactoe.shared.Board;
 
 public class App {
   private static Socket socket;
+  private static String p1Name;
+  private static String p2Name;
+  private static int p1Score = 0;
+  private static int p2Score = 0;
 
   public static void main(String[] clArgs) {
     try {
@@ -27,15 +31,24 @@ public class App {
         System.out.println("Disconnected from server");
         // Perform actions upon disconnection
       });
+
       socket.on("players", args -> {
         try {
-          JSONObject response = new JSONObject((String) args[0]);
-          System.out.println(response);
+          JSONObject names = new JSONObject((String) args[0]);
+          p1Name = names.getString("player1");
+          p2Name = names.getString("player2");
         } catch (JSONException e) {
         }
       });
       socket.on("updateBoard", args -> {
-        System.out.println((String) args[0]);
+        String board = (String) args[0];
+        String scoreStr = "| SCORE | " + p1Name + ": " + p1Score + " VS " + p2Name + ": "
+            + p2Score + " |";
+        System.out.println("-".repeat(scoreStr.length()));
+        System.out.println(scoreStr);
+        System.out.println("-".repeat(scoreStr.length()));
+        System.out.println("\n");
+        System.out.println(board);
         // Print the board to screen
       });
       socket.on("makeMove", args -> {
