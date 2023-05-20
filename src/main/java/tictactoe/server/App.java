@@ -26,37 +26,56 @@ public class App {
 
         final SocketIOServer server = new SocketIOServer(config);
         server.addEventListener("entergame", String.class, (client, name, ack) -> {
-            String response = "";
             if (player1.isEmpty()) {
                 player1 = Optional.of(new Player(client, name));
-                response = "player1";
+                ack.sendAckData("player1");
             } else if (player2.isEmpty()) {
                 if (name == player1.get().getName()) {
-                    response = "nameAlreadryUsed";
+                    ack.sendAckData("nameAlreadryUsed");
                 } else {
                     player2 = Optional.of(new Player(client, name));
                     player1.get().getSocket().sendEvent("opponentEntered", name);
-                    response = "player2";
+                    ack.sendAckData("player2");
 
                     try {
                         JSONObject players = new JSONObject();
                         players.put("player1", player1.get().getName());
                         players.put("player2", name);
-                        server.getBroadcastOperations().sendEvent("players", players.toString());
-                        server.getBroadcastOperations().sendEvent("updateBoard", new Board().toString());
+                        startGame();
                     } catch (Exception e) {
                     }
                 }
             } else {
-                response = "roomFull";
+                ack.sendAckData("roomFull");
             }
-            ack.sendAckData(response);
+
 
         });
 
         server.start();
 
+
     }
 
+    public void startGame(){
+        server.getBroadcastOperations().sendEvent("players", players.toString());
+        server.getBroadcastOperations().sendEvent("updateBoard", new Board().toString());
+        player1.get().getSocket().sendEvent("makeMove", new AckCallback<String>(String.class) {
+            @Override
+            public void onSuccess(String result) {
+                // Handle acknowledgment from the client
+            }
+        
+            @Override
+            public void onTimeout() {
+                // Handle acknowledgment timeout (optional)
+            }
+        });
+    }
+
+    public Board handleMove(){
+        
+
+    }
 
 }
