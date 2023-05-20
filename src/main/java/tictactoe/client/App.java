@@ -18,6 +18,7 @@ public class App {
   public static void main(String[] clArgs) {
     try {
       socket = IO.socket("http://localhost:9092");
+
       socket.on(Socket.EVENT_CONNECT, (args) -> {
         // System.out.println("Connected to server");
         // Perform actions upon successful connection
@@ -27,6 +28,7 @@ public class App {
         System.out.println("Disconnected from server");
         // Perform actions upon disconnection
       });
+
       socket.on("players", args -> {
         try {
           JSONObject response = new JSONObject((String) args[0]);
@@ -34,10 +36,12 @@ public class App {
         } catch (JSONException e) {
         }
       });
+
       socket.on("updateBoard", args -> {
         System.out.println((String) args[0]);
         // Print the board to screen
       });
+      
       socket.on("makeMove", args -> {
         System.out.println(args[0]);
         if (args.length > 1 && args[1] instanceof Ack) {
