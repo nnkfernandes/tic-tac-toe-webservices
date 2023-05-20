@@ -2,6 +2,8 @@ package tictactoe.server;
 
 import java.util.Optional;
 
+import org.json.JSONObject;
+
 import com.corundumstudio.socketio.AckRequest;
 import com.corundumstudio.socketio.Configuration;
 import com.corundumstudio.socketio.SocketIOClient;
@@ -27,15 +29,30 @@ public class App {
             @Override
             public void onData(SocketIOClient client, String name, AckRequest ackRequest) {
 
-                if (player1.isEmpty()) {
-                    player1 = Optional.of(new Player(client, name));
-                    client.sendEvent("entergame", name);
-                } else if (player2.isEmpty()) {
-                    player2 = Optional.of(new Player(client, name));
-                    player1.get().getSocket().sendEvent("opponentEntered", name);
-                } else {
-                    client.sendEvent("roomFull");
+                JSONObject response = new JSONObject();
+                try {
+                    if (player1.isEmpty()) {
+                        player1 = Optional.of(new Player(client, name));
+                        response.put("result", "player1");
+                    } else if (player2.isEmpty()) {
+                        if (name == player1.get().getName()) {
+                            response.put("result", "nameAlreadryUsed");
+                        } else {
+                            player2 = Optional.of(new Player(client, name));
+                            player1.get().getSocket().sendEvent("opponentEntered", name);
+                            response.put("result", "player2");
+
+                            JSONObject players = new JSONObject();
+                            players.put("player1", player1.get().getName());
+                            players.put("player2", name);
+                            server.getBroadcastOperations().sendEvent("players", players);
+                        }
+                    } else {
+                        response.put("result", "roomFull");
+                    }
+                } catch (Exception e) {
                 }
+                ackRequest.sendAckData(new Object[] { (Object) response });
             }
         });
 
