@@ -84,6 +84,13 @@ public class Client {
     socket.on("opponentDisconnect", args -> {
       System.out.println("Your opponent disconnected, waiting for other player to enter to restart game...");
     });
+
+    socket.on("invelidMove", args -> {
+      System.out.println("Invalid move! Please try again.");
+    });
+    socket.on("tileNotEmpty", args -> {
+      System.out.println("Tile not empty, please choose another one.");
+    });
   }
 
   public void start() {
@@ -93,7 +100,7 @@ public class Client {
   }
 
   private static int getMove() {
-    System.out.println("[Type your move (0-8)]:");
+    System.out.println("[Type your move (0-8) OR type 'q' to quit the game]:");
 
     while (true) {
       String input;

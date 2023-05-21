@@ -74,9 +74,12 @@ public class Server {
   }
 
   public void handleMove(Player player, Player opponent) {
+
+    opponent.getSocket().sendEvent("waiting");
     player.getSocket().sendEvent("makeMove", new AckCallback<Integer>(Integer.class) {
       @Override
       public void onSuccess(Integer pos) {
+
         TileState tile;
 
         try {
@@ -119,7 +122,6 @@ public class Server {
           server.getBroadcastOperations().sendEvent("updateBoard", board.toString());
         }
 
-        player.getSocket().sendEvent("waiting");
         handleMove(opponent, player);
       }
 
