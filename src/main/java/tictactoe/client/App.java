@@ -9,8 +9,6 @@ import org.json.JSONObject;
 import io.socket.client.Ack;
 import io.socket.client.IO;
 import io.socket.client.Socket;
-import io.socket.emitter.Emitter;
-import tictactoe.shared.Board;
 
 public class App {
   private static Socket socket;
@@ -18,6 +16,7 @@ public class App {
   private static String p2Name;
   private static int p1Score = 0;
   private static int p2Score = 0;
+  private static Scanner scanner = new Scanner(System.in);
 
   public static void main(String[] clArgs) {
     try {
@@ -61,13 +60,26 @@ public class App {
       });
 
       socket.on("makeMove", args -> {
-        System.out.println(args[0]);
-        if (args.length > 1 && args[1] instanceof Ack) {
-          // pedir movimento para o jogador
-          // TODO
-          // mandar movimento para o servidor
-          ((Ack) args[1]).call("movimento do jogador");
-        }
+        // pedir movimento para o jogador
+        int move = getMove();
+        // mandar movimento para o servidor
+        ((Ack) args[0]).call(move);
+      });
+
+      socket.on("victory", args -> {
+        System.out.println("You won the game. :)");
+      });
+
+      socket.on("defeat", args -> {
+        System.out.println("You lost the game. :(");
+      });
+
+      socket.on("tie", args -> {
+        System.out.println("The old lady won");
+      });
+
+      socket.on("waiting", args -> {
+        System.out.println("Waiting for opponent move...");
       });
 
       // Connect to the server
@@ -75,16 +87,31 @@ public class App {
 
       enterGame();
 
-    } catch (
-
-    URISyntaxException e) {
+    } catch (URISyntaxException e) {
       e.printStackTrace();
     }
   }
 
-  private static void enterGame() {
-    Scanner scanner = new Scanner(System.in);
+  private static int getMove() {
+    System.out.println("[Type your move (0-8)]:");
 
+    while (true) {
+      String input;
+      input = scanner.nextLine();
+
+      if (input.equals("q")) {
+        scanner.close();
+        System.exit(0);
+      }
+      try {
+        return Integer.parseInt(input);
+      } catch (NumberFormatException e) {
+        System.out.println("Please type your a valid number");
+      }
+    }
+  }
+
+  private static void enterGame() {
     System.out.print("Enter yout name: ");
     String name = scanner.nextLine();
 
@@ -101,8 +128,6 @@ public class App {
         System.out.println("The room is full");
       }
     });
-
-    scanner.close();
   }
 
 }

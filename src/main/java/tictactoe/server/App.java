@@ -2,6 +2,7 @@ package tictactoe.server;
 
 import java.util.Optional;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.corundumstudio.socketio.AckCallback;
@@ -61,11 +62,12 @@ public class App {
         } catch (Exception e) {
         }
         server.getBroadcastOperations().sendEvent("updateBoard", new Board().toString());
-        handleMove(player1.get());
+
+        handleMove(player1.get(), player2.get());
     }
 
-    public static void handleMove(Player player) {
-       player.getSocket().sendEvent("makeMove", new AckCallback<Integer>(Integer.class) {
+    public static void handleMove(Player player, Player opponent) {
+        player.getSocket().sendEvent("makeMove", new AckCallback<Integer>(Integer.class) {
             @Override
             public void onSuccess(Integer pos) {
                 TileState tile;
@@ -74,26 +76,44 @@ public class App {
                     tile = board.getTile(pos);
                 } catch (IndexOutOfBoundsException e) {
                     player.getSocket().sendEvent("invalidMove");
-                    handleMove(player);
+                    handleMove(player, opponent);
                     return;
                 }
                 if (tile != TileState.EMPTY) {
-                    player.getSocket().sendEvent("tileNotMT");
-                    handleMove(player);
+                    player.getSocket().sendEvent("tileNotEmpty");
+                    handleMove(player, opponent);
                     return;
                 }
 
                 System.out.println("player " + player.getName() + " made move at position " + pos);
-                
+
                 board.setTile(pos, player.getTile());
+                server.getBroadcastOperations().sendEvent("updateBoard", board.toString());
 
                 if (checkVictory(pos)) {
+                    System.out.println("player " + player.getName() + " won this round");
                     player.getSocket().sendEvent("victory");
-                    player.setScore(player.getScore() + 1); 
-                } else {
-
+                    opponent.getSocket().sendEvent("defeat");
+                    player.setScore(player.getScore() + 1);
+                    try {
+                        JSONObject scores = new JSONObject();
+                        scores.put("player1", player1.get().getScore());
+                        scores.put("player2", player2.get().getScore());
+                        server.getBroadcastOperations().sendEvent("updateScore", scores.toString());
+                    } catch (JSONException e) {
+                    }
+                    board.clean();
+                    server.getBroadcastOperations().sendEvent("updateBoard", board.toString());
+                } else if (checkTie()) {
+                    System.out.println("Old lady!");
+                    player.getSocket().sendEvent("tie");
+                    opponent.getSocket().sendEvent("tie");
+                    board.clean();
+                    server.getBroadcastOperations().sendEvent("updateBoard", board.toString());
                 }
-                    
+
+                player.getSocket().sendEvent("waiting");
+                handleMove(opponent, player);
             }
 
             @Override
@@ -142,6 +162,10 @@ public class App {
             default:
                 return false;
         }
-    
+    }
+
+    private static boolean checkTie() {
+        return !board.stream().anyMatch(TileState.EMPTY::equals);
+    }
 
 }
