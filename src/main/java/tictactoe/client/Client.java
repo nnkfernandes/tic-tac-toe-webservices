@@ -64,14 +64,17 @@ public class Client {
 
     socket.on("victory", args -> {
       System.out.println("You won the game. :)");
+      System.out.println("Let's start a new round!");
     });
 
     socket.on("defeat", args -> {
       System.out.println("You lost the game. :(");
+      System.out.println("Let's start a new round!");
     });
 
     socket.on("tie", args -> {
       System.out.println("The old lady won");
+      System.out.println("Let's start a new round!");
     });
 
     socket.on("waiting", args -> {
