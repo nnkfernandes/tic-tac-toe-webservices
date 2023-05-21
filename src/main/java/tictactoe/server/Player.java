@@ -41,6 +41,10 @@ public class Player {
         return score;
     }
 
+    public void setTile(TileState tile) {
+        this.tile = tile;
+    }
+
     public void setScore(int score) {
         this.score = score;
     }

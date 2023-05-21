@@ -1,16 +1,6 @@
 package tictactoe.server;
 
-import java.util.Optional;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import com.corundumstudio.socketio.AckCallback;
 import com.corundumstudio.socketio.Configuration;
-import com.corundumstudio.socketio.SocketIOServer;
-
-import tictactoe.shared.Board;
-import tictactoe.shared.TileState;
 
 /**
  * Hello world!

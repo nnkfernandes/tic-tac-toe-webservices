@@ -41,6 +41,22 @@ public class Server {
 
     });
 
+    server.addDisconnectListener((client) -> {
+      if (player1.isPresent() && player1.get().getSocket().getSessionId() == client.getSessionId()) {
+        player1 = player2;
+      } else if (player2.isEmpty() || player2.get().getSocket().getSessionId() != client.getSessionId()) {
+        // Someone that is none of the players disconnected
+        return;
+      }
+      player2 = Optional.empty();
+
+      player1.ifPresent((player) -> {
+        player.setScore(0);
+        player.setTile(TileState.CROSS);
+        player.getSocket().sendEvent("opponentDisconnect");
+      });
+    });
+
     server.start();
   }
 

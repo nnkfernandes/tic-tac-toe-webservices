@@ -80,6 +80,10 @@ public class Client {
     socket.on("waiting", args -> {
       System.out.println("Waiting for opponent move...");
     });
+
+    socket.on("opponentDisconnect", args -> {
+      System.out.println("Your opponent disconnected, waiting for other player to enter to restart game...");
+    });
   }
 
   public void start() {
