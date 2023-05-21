@@ -5,14 +5,20 @@ import java.net.Socket;
 
 import com.corundumstudio.socketio.SocketIOClient;
 
+import tictactoe.shared.TileState;
+
 public class Player {
 
     private SocketIOClient socket;
     private String name;
+    private TileState tile;
+    private int score = 0;
 
-    public Player(SocketIOClient socket, String name) {
+    public Player(SocketIOClient socket, String name, TileState tile) {
         this.name = name;
         this.socket = socket;
+        this.tile = tile;
+        this.score = score;
     }
 
     public SocketIOClient getSocket() {
@@ -31,4 +37,15 @@ public class Player {
         this.name = name;
     }
 
+    public TileState getTile() {
+        return tile;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
+    }
 }
