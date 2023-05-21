@@ -1,133 +1,20 @@
 package tictactoe.client;
 
 import java.net.URISyntaxException;
-import java.util.Scanner;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import io.socket.client.Ack;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 
 public class App {
-  private static Socket socket;
-  private static String p1Name;
-  private static String p2Name;
-  private static int p1Score = 0;
-  private static int p2Score = 0;
-  private static Scanner scanner = new Scanner(System.in);
 
   public static void main(String[] clArgs) {
     try {
-      socket = IO.socket("http://localhost:9092");
+      Socket socket = IO.socket("http://localhost:9092");
+      Client client = new Client(socket);
 
-      socket.on(Socket.EVENT_CONNECT, (args) -> {
-        // System.out.println("Connected to server");
-        // Perform actions upon successful connection
-      });
-
-      socket.on(Socket.EVENT_DISCONNECT, (args) -> {
-        System.out.println("Disconnected from server");
-        // Perform actions upon disconnection
-      });
-
-      socket.on("setPlayers", args -> {
-        try {
-          JSONObject names = new JSONObject((String) args[0]);
-          p1Name = names.getString("player1");
-          p2Name = names.getString("player2");
-        } catch (JSONException e) {
-        }
-      });
-      socket.on("updateScore", args -> {
-        try {
-          JSONObject scores = new JSONObject((String) args[0]);
-          p1Score = scores.getInt("player1");
-          p2Score = scores.getInt("player2");
-        } catch (JSONException e) {
-        }
-      });
-      socket.on("updateBoard", args -> {
-        String board = (String) args[0];
-        String scoreStr = "| SCORE | " + p1Name + ": " + p1Score + " VS " + p2Name + ": "
-            + p2Score + " |";
-        System.out.println("-".repeat(scoreStr.length()));
-        System.out.println(scoreStr);
-        System.out.println("-".repeat(scoreStr.length()));
-        System.out.println("\n");
-        System.out.println(board);
-      });
-
-      socket.on("makeMove", args -> {
-        // pedir movimento para o jogador
-        int move = getMove();
-        // mandar movimento para o servidor
-        ((Ack) args[0]).call(move);
-      });
-
-      socket.on("victory", args -> {
-        System.out.println("You won the game. :)");
-      });
-
-      socket.on("defeat", args -> {
-        System.out.println("You lost the game. :(");
-      });
-
-      socket.on("tie", args -> {
-        System.out.println("The old lady won");
-      });
-
-      socket.on("waiting", args -> {
-        System.out.println("Waiting for opponent move...");
-      });
-
-      // Connect to the server
-      socket.connect();
-
-      enterGame();
-
+      client.start();
     } catch (URISyntaxException e) {
       e.printStackTrace();
     }
-  }
-
-  private static int getMove() {
-    System.out.println("[Type your move (0-8)]:");
-
-    while (true) {
-      String input;
-      input = scanner.nextLine();
-
-      if (input.equals("q")) {
-        scanner.close();
-        System.exit(0);
-      }
-      try {
-        return Integer.parseInt(input);
-      } catch (NumberFormatException e) {
-        System.out.println("Please type your a valid number");
-      }
-    }
-  }
-
-  private static void enterGame() {
-    System.out.print("Enter yout name: ");
-    String name = scanner.nextLine();
-
-    socket.emit("entergame", name, (Ack) args -> {
-      String response = (String) args[0];
-      if (response.equals("player1")) {
-        System.out.println("You are player 1, waiting for other player...");
-      } else if (response.equals("player2")) {
-        System.out.println("You are player 2, the game is about to start.");
-      } else if (response.equals("nameAlreadyUsed")) {
-        System.out.println("This name is already used");
-        enterGame();
-      } else if (response.equals("roomFull")) {
-        System.out.println("The room is full");
-      }
-    });
   }
 
 }

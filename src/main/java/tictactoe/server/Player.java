@@ -1,8 +1,5 @@
 package tictactoe.server;
 
-import java.lang.reflect.Constructor;
-import java.net.Socket;
-
 import com.corundumstudio.socketio.SocketIOClient;
 
 import tictactoe.shared.TileState;
@@ -18,7 +15,6 @@ public class Player {
         this.name = name;
         this.socket = socket;
         this.tile = tile;
-        this.score = score;
     }
 
     public SocketIOClient getSocket() {
