@@ -85,7 +85,7 @@ public class Client {
       System.out.println("Your opponent disconnected, waiting for other player to enter to restart game...");
     });
 
-    socket.on("invelidMove", args -> {
+    socket.on("invalidMove", args -> {
       System.out.println("Invalid move! Please try again.");
     });
     socket.on("tileNotEmpty", args -> {

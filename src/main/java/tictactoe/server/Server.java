@@ -68,7 +68,7 @@ public class Server {
       server.getBroadcastOperations().sendEvent("setPlayers", players.toString());
     } catch (Exception e) {
     }
-    server.getBroadcastOperations().sendEvent("updateBoard", new Board().toString());
+    server.getBroadcastOperations().sendEvent("updateBoard", board.toString());
 
     handleMove(player1.get(), player2.get());
   }
